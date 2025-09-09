@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  web:
+    # build: .
+    # command: python manage.py runserver 0.0.0.0:8000
+    # volumes:
+    #   - .:/app
+    image: ctd2401/Object_Backend:latest
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.docker
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+
+volumes:
+  postgres_data:
