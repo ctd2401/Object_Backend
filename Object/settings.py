@@ -31,8 +31,8 @@ DEBUG = os.environ.get("DEBUG","False")
 ALLOWED_HOSTS = ["*"]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
+    os.environ.get("LOCAL_FE"),
+    os.environ.get("PROD_FE"),
 ]
 
 CORS_ALLOW_CREDENTIALS = (
