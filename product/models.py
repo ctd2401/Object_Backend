@@ -67,7 +67,7 @@ class ProductVariant(models.Model):
         unique_together = ('product', 'variant')
 
     def __str__(self):
-        return f"{self.product.name} - {self.variant.name} - {self.variant.v_type.name}"
+        return f"{self.product.name} - {self.variant.name} - {self.variant.v_type.name} - {"Còn hàng" if self.available else "Hết hàng"}"
     
 
     def save(self, *args, **kwargs):
