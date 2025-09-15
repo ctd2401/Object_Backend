@@ -26,6 +26,7 @@ class AllProduct(APIView):
             page = request.query_params.get("page", 1)
             limit = request.query_params.get("limit", 10)
             keyword = request.query_params.get("keyword", None)
+            category = request.query_params.get("category",None)
             try:
                 page = int(page)
                 limit = int(limit)
@@ -35,10 +36,13 @@ class AllProduct(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            products = Product.objects.filter(available=True).order_by('name')
+            products = Product.objects.all().order_by('name')
             # Lọc theo keyword nếu có
             if keyword:
-                products = products.filter(Q(name__icontains=keyword) |Q(code__icontains=keyword))
+                products = products.filter(name__icontains=keyword)
+            if category:
+                products = products.filter(category_id=category)
+
 
             # Tính toán phân trang
             total_items = products.count()
@@ -95,8 +99,8 @@ class ProductDetailView(APIView):
 
 
     def get(self, request, pk):
-        product = Product.objects.prefetch_related('productvariant_product').get(pk=pk)
-        if product.available == False:
+        product = get_object_or_404(Product,pk=pk)
+        if not product or product.available == False:
             return Response(
                 {"error": "Product not found."},
                 status=status.HTTP_404_NOT_FOUND,

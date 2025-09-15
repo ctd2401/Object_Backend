@@ -35,8 +35,9 @@ class CategoryView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            categories = Category.objects.filter(active=True).order_by('name')
+            categories = Category.objects.all().order_by('name')
             # Lọc theo keyword nếu có
+            print(categories)
             if keyword:
                 categories = categories.filter(Q(name__icontains=keyword) |Q(code__icontains=keyword))
 

@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = os.environ.get("DEBUG","False")
 
 ALLOWED_HOSTS = ["*"]
-
+print(os.environ.get('LOCAL_FE'),os.environ.get("PROD_FE"))
 CORS_ALLOWED_ORIGINS = [
     os.environ.get("LOCAL_FE"),
     os.environ.get("PROD_FE"),
@@ -40,7 +40,6 @@ CORS_ALLOW_CREDENTIALS = (
 )
 
 # Application definition
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",

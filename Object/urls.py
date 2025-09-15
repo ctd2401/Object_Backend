@@ -22,7 +22,7 @@ urlpatterns = [
     ### admin site
     path('admin/', admin.site.urls),
     ### api product
-    path('product/', include('product.urls')),
+    path('api/product/', include('product.urls')),
     ### api category
-    path('category/', include('category.urls')),
+    path('api/category/', include('category.urls')),
 ]
