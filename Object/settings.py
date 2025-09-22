@@ -29,12 +29,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = os.environ.get("DEBUG","False")
 
 ALLOWED_HOSTS = ["*"]
-print(os.environ.get('LOCAL_FE'),os.environ.get("PROD_FE"))
+
 CORS_ALLOWED_ORIGINS = [
     os.environ.get("LOCAL_FE"),
     os.environ.get("PROD_FE"),
+    os.environ.get("PROD_FE_2")
 ]
-
+# SECURE_SSL_REDIRECT =True
+# CSRF_COOKIE_SECURE = True
 CORS_ALLOW_CREDENTIALS = (
     True  # Sử dụng khi dùng cookie/session login (gửi withCredentials: true từ FE)
 )

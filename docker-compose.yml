@@ -1,32 +1,50 @@
-version: '3.9'
+version: '3.8'
 
 services:
-  web:
-    # build: .
-    # command: python manage.py runserver 0.0.0.0:8000
-    # volumes:
-    #   - .:/app
-    image: ctd2401/Object_Backend:latest
-    ports:
-      - "8000:8000"
-    env_file:
-      - .env.docker
-    depends_on:
-      - db
-
   db:
-    image: postgres:16
+    image: postgres:15
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-object_db}
+      POSTGRES_USER: ${DATABASE_USER:-postgres}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER}"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-postgres}"]
+      interval: 10s
       timeout: 5s
       retries: 5
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
     environment:
-      POSTGRES_DB: ${DATABASE_NAME}
-      POSTGRES_USER: ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      - DEBUG=True
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=${DATABASE_NAME:-object_db}
+      - DATABASE_USER=${DATABASE_USER:-postgres}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD:-postgres}
+      - SECRET_KEY=${SECRET_KEY:-django-insecure-dev-key}
+      - LOCAL_FE=${LOCAL_FE:-http://localhost:3000}
+      - PROD_FE=${PROD_FE:-http://localhost:3000}
+      - CC_NAME=${CC_NAME}
+      - CC_API_KEY=${CC_API_KEY}
+      - CC_API_SECRET=${CC_API_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   postgres_data:

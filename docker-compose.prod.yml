@@ -1,0 +1,128 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # web:
+  #   build: .
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     - DEBUG=False
+  #     - DATABASE_HOST=db
+  #     - DATABASE_PORT=5432
+  #     - DATABASE_NAME=${DATABASE_NAME}
+  #     - DATABASE_USER=${DATABASE_USER}
+  #     - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+  #     - SECRET_KEY=${SECRET_KEY}
+  #     - LOCAL_FE=${LOCAL_FE}
+  #     - PROD_FE=${PROD_FE}
+  #     - CC_NAME=${CC_NAME}
+  #     - CC_API_KEY=${CC_API_KEY}
+  #     - CC_API_SECRET=${CC_API_SECRET}
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+
+  # nginx:
+  #   image: nginx:alpine
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - static_volume:/app/staticfiles
+  #     - media_volume:/app/media
+  #   depends_on:
+  #     - web
+  #   restart: unless-stopped
+
+###
+  web:
+    build: .
+    container_name: django_app
+    command: gunicorn myproject.wsgi:application --bind 0.0.0.0:8000
+    expose:
+      - "8000"
+    ports:
+      - "8000:8000"   # Giữ lại để healthcheck dùng, nhưng proxy sẽ xài EXPOSE
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    environment:
+      - DEBUG=False
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
+      - LOCAL_FE=${LOCAL_FE}
+      - PROD_FE=${PROD_FE}
+      - CC_NAME=${CC_NAME}
+      - CC_API_KEY=${CC_API_KEY}
+      - CC_API_SECRET=${CC_API_SECRET}
+
+      # Biến môi trường cho nginx-proxy + letsencrypt
+      - VIRTUAL_HOST=${DOMAIN},${WWW_DOMAIN}
+      - LETSENCRYPT_HOST=${DOMAIN},${WWW_DOMAIN}
+      - LETSENCRYPT_EMAIL=${EMAIL_DOMAIN}
+
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine
+    container_name: nginx_proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./nginx/custom.conf:/etc/nginx/conf.d/custom.conf:ro
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+      - certs:/etc/nginx/certs:rw
+    restart: unless-stopped
+
+  letsencrypt:
+    image: nginxproxy/acme-companion
+    container_name: nginx_le
+    depends_on:
+      - nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - certs:/etc/nginx/certs:rw
+    restart: unless-stopped
+
+###
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:

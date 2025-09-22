@@ -1,35 +1,35 @@
-#!/bin/sh
+#!/bin/bash
 
+# Exit on any error
+set -e
 
-# while ! nc -z db 5432; do
-#   sleep 0.1
-# done
-
-# echo "PostgreSQL started"
-
-# # Apply migrations
-# python manage.py migrate
-
-# # Khởi động server
-# python manage.py runserver 0.0.0.0:8000
-
-
-
-echo "Waiting for postgres..."
-
-while ! nc -z db 5432; do
-  sleep 1
+# Wait for database to be ready
+echo "Waiting for database..."
+while ! nc -z $DATABASE_HOST $DATABASE_PORT; do
+  sleep 0.1
 done
+echo "Database started"
 
-echo "PostgreSQL started"
-
-
-echo "makemigrations"
-python manage.py makemigrations
-
-echo "Apply migrations"
+# Run migrations
+echo "Running migrations..."
 python manage.py migrate
 
-# Khởi động server
-echo "Starting server"
-exec python manage.py runserver 0.0.0.0:8000
+# Create superuser if it doesn't exist (optional)
+echo "Creating superuser if not exists..."
+python manage.py shell -c "
+from django.contrib.auth import get_user_model
+User = get_user_model()
+if not User.objects.filter(username='admin').exists():
+    User.objects.create_superuser('admin', 'admin@example.com', '1')
+    print('Superuser created')
+else:
+    print('Superuser already exists')
+"
+
+# Collect static files
+echo "Collecting static files..."
+python manage.py collectstatic --noinput
+
+# Start server
+echo "Starting server..."
+exec "$@"
