@@ -1,5 +1,5 @@
 Step to deploy ( Ubuntu/Linux )
-- Clone code
+- Clone code ( into /var/www )
 - Install PostgreSQL
     -  sudo apt install postgresql postgresql-contrib
     -  sudo systemctl start postgresql.service
@@ -9,12 +9,9 @@ Step to deploy ( Ubuntu/Linux )
 - sudo apt-get update
 - sudo apt-get install -y libpq-dev gcc python3-dev
 - install virtual enviroment ( python -m venv env )
-- python3 manage.py runserver 0.0.0.0:8000
+- pip install -r requirements.txt
+- run deploy-nginx-django.sh file ( chmod +x deploy-nginx-django.sh & ./deploy-nginx-django.sh)
+- sudo -u www-data /var/www/Object_Backend/env/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 Object.wsgi:application
 
-- for production
-- sudo apt update
-- sudo apt install -y python3-pip python3-venv python3-dev libpq-dev gcc nginx
-- gunicorn --bind 0.0.0.0:8000 Object.wsgi:application
-- sudo nano /etc/systemd/system/myproject.service
 
 
