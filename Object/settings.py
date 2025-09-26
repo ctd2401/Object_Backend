@@ -35,6 +35,9 @@ CORS_ALLOWED_ORIGINS = [
     os.environ.get("PROD_FE"),
     os.environ.get("PROD_FE_2")
 ]
+CSRF_TRUSTED_ORIGINS=[os.environ.get('PROD_BE')]
+
+
 # SECURE_SSL_REDIRECT =True
 # CSRF_COOKIE_SECURE = True
 CORS_ALLOW_CREDENTIALS = (
