@@ -178,3 +178,47 @@ SWAGGER_SETTINGS = {
 }
 
 X_FRAME_OPTIONS = "*"
+
+
+import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{asctime}] {levelname} {name}: {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'Product_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'Product.log'),
+            'formatter': 'verbose',
+        },
+        'Category_file':{
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'Category.log'),
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'Product': {   # logger này chỉ dành riêng cho app "Product"
+            'handlers': ['Product_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'Category': {   # logger này chỉ dành riêng cho app "Category"
+            'handlers': ['Category_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
+
