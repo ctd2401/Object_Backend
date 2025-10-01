@@ -181,7 +181,7 @@ X_FRAME_OPTIONS = "*"
 
 
 import os
-from pathlib import Path
+from utils.logging import JsonFormatter
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -198,19 +198,35 @@ LOGGING = {
         'Product_file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'Product.log'),
-            'formatter': 'verbose',
+            'filename': os.path.join(BASE_DIR, 'logs', 'Product.jsonl'),
+            'formatter': 'json',
         },
         'Category_file':{
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'Category.log'),
-            'formatter': 'verbose',
+            'filename': os.path.join(BASE_DIR, 'logs', 'Category.jsonl'),
+            'formatter': 'json',
+        },
+        'ProductVariant_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'ProductVariant.jsonl'),
+            'formatter': 'json',
+        }
+    },
+    "formatters": {
+        "json": {
+            "()": JsonFormatter,
         },
     },
     'loggers': {
         'Product': {   # logger này chỉ dành riêng cho app "Product"
             'handlers': ['Product_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'ProductVariant':{   # logger này chỉ dành riêng cho app "Product Variant"
+            'handlers': ['ProductVariant_file'],
             'level': 'INFO',
             'propagate': False,
         },
