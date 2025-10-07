@@ -3,3 +3,7 @@ venv
 .env.docker
 .sh
 logs
+__pycache__/
+*.pyc
+*.pyo
+*.pyd

@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECRET_KEY = "django-insecure-k_g@-@yj!f&s$^@4$n0+si)7b%lhx0(ad-kyg=99w5g2s8$8l^"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG","False")
+DEBUG = os.environ.get("DEBUG",False)
 
 ALLOWED_HOSTS = ["*"]
 
@@ -46,6 +46,7 @@ CORS_ALLOW_CREDENTIALS = (
 
 # Application definition
 INSTALLED_APPS = [
+    'whitenoise.runserver_nostatic',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -60,8 +61,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -180,7 +181,6 @@ SWAGGER_SETTINGS = {
 X_FRAME_OPTIONS = "*"
 
 
-import os
 from utils.logging import JsonFormatter
 
 BASE_DIR = Path(__file__).resolve().parent.parent

@@ -7,8 +7,8 @@ set -euo pipefail
 DOMAIN="your_domain"
 EMAIL="your_email"     # Email nhận thông báo từ Let's Encrypt
 PROJECT_NAME="Object"   # Thư mục chứa Django project
-PROJECT_DIR="/root/Object_Backend/${PROJECT_NAME}"
-VENV_DIR="/root/Object_Backend/env"
+PROJECT_DIR="/var/www/Object_Backend/${PROJECT_NAME}"
+VENV_DIR="/var/www/Object_Backend/env"
 GUNICORN_SERVICE="gunicorn"
 
 # -----------------------
@@ -26,6 +26,8 @@ mkdir -p "$PROJECT_DIR"
 cd "$PROJECT_DIR"
 python3 -m venv "$VENV_DIR"
 source "$VENV_DIR/bin/activate"
+echo "Collecting static..."
+python manage.py collectstatic --noinput
 pip install -U pip django gunicorn
 deactivate
 
@@ -90,3 +92,7 @@ sudo certbot --nginx -d "${DOMAIN}" -m "${EMAIL}" --agree-tos --no-eff-email --r
 # -----------------------
 echo "[6/6] Hoàn tất triển khai Django + Nginx + HTTPS cho domain ${DOMAIN}"
 echo "Kiểm tra bằng cách mở: https://${DOMAIN}"
+
+mkdir -p /var/www/Object_Backend/logs
+chown -R www-data:www-data /var/www/Object_Backend/logs
+chmod 755 /var/www/Object_Backend/logs

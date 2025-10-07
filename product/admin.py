@@ -34,7 +34,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 class ProductVariantAdmin(admin.ModelAdmin):
-    # list_display = ('available')
+    list_display = ('product','variant','available',)
     list_filter = ('available','product',)
     search_fields = ('product__name',)
     list_per_page = 50
