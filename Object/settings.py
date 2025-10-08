@@ -92,6 +92,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "Object.wsgi.application"
 
+# data upload limit
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 # setting cloudinary
 import cloudinary
 import cloudinary.uploader
@@ -100,6 +103,7 @@ cloudinary.config(
   	cloud_name = os.environ.get("CC_NAME"),
   	api_key = os.environ.get("CC_API_KEY"),
   	api_secret = os.environ.get("CC_API_SECRET"),
+    chunk_size = 6000000
 )
 
 
