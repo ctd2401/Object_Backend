@@ -1,7 +1,11 @@
 from django.contrib import admin
 from .models import *
 
-
+class ProductVariantTabularInline(admin.TabularInline):
+    model = ProductVariant
+    extra = 1 # Số dòng trống để thêm variant mới
+    fields = ['product','variant','image','price_diff','available']
+    # ordering = ['variant__variant_type']
 
 class ProductAdmin(admin.ModelAdmin):
 
@@ -10,6 +14,7 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ('name','code','slug',)
     prepopulated_fields = {'slug':('name',)}
     list_per_page = 50
+    inlines = [ProductVariantTabularInline]
     actions = ['set_default_description','set_active_status','set_inactive_status']
 
     def get_ordering(self,request):
